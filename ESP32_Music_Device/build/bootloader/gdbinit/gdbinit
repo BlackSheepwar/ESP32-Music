@@ -1,0 +1,2 @@
+source D:/a1/Project/ESP32-Music/ESP32_Music_Device/build/bootloader/gdbinit/symbols
+source D:/a1/Project/ESP32-Music/ESP32_Music_Device/build/bootloader/gdbinit/connect

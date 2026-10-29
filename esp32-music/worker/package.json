@@ -1,0 +1,16 @@
+{
+  "name": "music-intent-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "ESP32 智能音乐生成 - 云端意图解析 API",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail --format pretty",
+    "test": "node test/local.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4"
+  }
+}

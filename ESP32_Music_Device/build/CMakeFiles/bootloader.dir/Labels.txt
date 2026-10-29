@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+D:/a1/Project/ESP32-Music/ESP32_Music_Device/build/CMakeFiles/bootloader
+D:/a1/Project/ESP32-Music/ESP32_Music_Device/build/CMakeFiles/bootloader.rule
+D:/a1/Project/ESP32-Music/ESP32_Music_Device/build/CMakeFiles/bootloader-complete.rule
+D:/a1/Project/ESP32-Music/ESP32_Music_Device/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+D:/a1/Project/ESP32-Music/ESP32_Music_Device/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+D:/a1/Project/ESP32-Music/ESP32_Music_Device/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+D:/a1/Project/ESP32-Music/ESP32_Music_Device/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+D:/a1/Project/ESP32-Music/ESP32_Music_Device/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+D:/a1/Project/ESP32-Music/ESP32_Music_Device/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+D:/a1/Project/ESP32-Music/ESP32_Music_Device/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule

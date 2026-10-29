@@ -1,0 +1,82 @@
+# Cloudflare Worker 配置
+# 文档: https://developers.cloudflare.com/workers/wrangler/configuration/
+
+name = "music-intent-api"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+# ---------------------------------------------------------------------------
+# Workers AI 绑定
+#
+# 有了这个绑定，Worker 里可以直接 env.AI.run(...)：
+#   - 不需要任何 API Key
+#   - 不需要绑信用卡
+#   - 免费额度 10,000 Neurons/天
+#
+# remote = true -> 本地 wrangler dev 时也走云端真实模型
+#
+# ★ 实测结论（2026-10-13，中国大陆网络）：
+#     部署到 Cloudflare 上时，AI 调用 182ms 返回，完全正常。
+#     本地 wrangler dev 调 AI 会稳定超时（约 42 秒后报 internal error），
+#     因为本地远程绑定要走一条被墙的代理链路。
+#   => AI 只能在「真正部署」的状态下使用。
+#   => 本地调试请设置代理环境变量（见 README）：
+#        $env:NODE_USE_ENV_PROXY='1'; $env:HTTPS_PROXY='http://127.0.0.1:7897'
+# ---------------------------------------------------------------------------
+[ai]
+binding = "AI"
+remote = true
+
+# ---------------------------------------------------------------------------
+# 环境变量
+#
+# STAGE 控制后端走到哪一步，用来「分离变量」调试：
+#   mock  —— 完全不调用 AI，直接返回一份固定的结构化音乐数据
+#            ★ 硬件没到货、或想省 AI 额度时用它
+#   echo  —— 只解析并回显 WAV 头信息 + RMS 音量
+#            ★ 麦克风调试用：能一眼看出是硬件问题还是云端问题
+#   asr   —— 只跑 Whisper，返回识别文本
+#   full  —— Whisper + LLM 意图解析 + 乐理展开 + 编排（最终形态）
+#
+# DEVICE_TOKEN:
+#   留空 = 不校验（开发期）
+#   填上 = 要求 ESP32 带 Authorization: Bearer <token>
+#   ★ 设备上放的是这个「可随时作废的网关令牌」，
+#     而不是 AI 服务商的 API Key —— 这正是需要 Worker 这一层的原因之一。
+#
+# ASR_MODEL / LLM_MODEL:
+#   留空 = 用 src/index.js 里的默认值。
+#   排查模型问题时可以在这里临时替换，不需要改代码。
+#
+# TOTAL_BARS:  曲长（小节数），4~32，默认 16。
+#   90bpm 下 16 小节约 42 秒。前端有循环播放，可以一直放。
+#   ★ 注意这个值直接决定响应体积：32 小节时响应约 10KB，
+#     固件端的接收缓冲要相应加大（API.md 里有说明）。
+#
+#   ★ 补一条实测数据（2026-10，仅供参考，当前保持 16 不变）★
+#     换算公式（step_ms = 60000/bpm/steps_per_beat，每小节 8 步）：
+#       16 小节 @80bpm  → 48.0 秒   ← 实测日志确认过（当前值）
+#        8 小节 @80bpm  → 24.0 秒
+#       16 小节 @120bpm → 32.0 秒
+#     ★ 这个值【不影响上传速度】★
+#       上传的是设备录的那段音频（约 40~100KB）；
+#       响应体是乐谱 JSON，不管曲子多长都约 2.5~10KB。
+#       它只影响：① KS 实时合成的时长（CPU 占用时间）
+#                 ② 响应体积（32 小节约 10KB）
+#
+# DRUMS:  auto = 按风格自动挑鼓型；off = 完全不加鼓
+# ---------------------------------------------------------------------------
+[vars]
+STAGE = "full"
+DEVICE_TOKEN = ""
+MAX_AUDIO_SECONDS = "15"
+ASR_MODEL = ""
+LLM_MODEL = ""
+TOTAL_BARS = "16"
+DRUMS = "auto"
+
+# 实时日志，配合 npm run tail 使用
+# 注意：tail 走 tail.developers.workers.dev，在中国大陆被 DNS 投毒，
+#       需要设置代理环境变量才能用
+[observability]
+enabled = true
